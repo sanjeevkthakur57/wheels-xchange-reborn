@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -10,9 +11,11 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CheckCircle, ArrowRight, Upload, Clock, Car, Calendar, FileText, Camera, MapPin } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 const SellCar = () => {
   const [step, setStep] = useState(1);
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     make: '',
     model: '',
@@ -35,12 +38,56 @@ const SellCar = () => {
     phone: '',
     city: ''
   });
+  
+  // Add states for file uploads
+  const [carPhotos, setCarPhotos] = useState({
+    frontView: null,
+    sideView: null,
+    rearView: null,
+    interior: null,
+    dashboard: null,
+    seats: null
+  });
+  
+  const [documents, setDocuments] = useState({
+    rc: null,
+    insurance: null,
+    puc: null,
+    service: null
+  });
+  
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleNext = () => {
+    // Validate current step before proceeding
+    if (step === 1) {
+      // Basic validation for required fields in step 1
+      const requiredFields = ['make', 'model', 'year', 'fuel', 'transmission', 'bodyType', 'kilometers', 'registrationState', 'registrationNumber'];
+      const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+      
+      if (missingFields.length > 0) {
+        toast({
+          title: "Missing information",
+          description: "Please fill in all required fields marked with *",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (formData.insurance === 'yes' && !formData.insuranceValidity) {
+        toast({
+          title: "Missing information",
+          description: "Please provide insurance validity date",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+    
     setStep(prevStep => prevStep + 1);
     window.scrollTo(0, 0);
   };
@@ -52,11 +99,77 @@ const SellCar = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Validate contact info before submission
+    const requiredContactFields = ['name', 'email', 'phone', 'city'];
+    const missingFields = requiredContactFields.filter(field => !formData[field as keyof typeof formData]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required contact information fields",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // In a real app, this would submit the data to the backend
     console.log('Form data submitted:', formData);
+    console.log('Car photos:', carPhotos);
+    console.log('Documents:', documents);
+    
+    // Show success toast
+    toast({
+      title: "Submission successful",
+      description: "Your car details have been submitted successfully!",
+    });
+    
     // Move to success step
     setStep(4);
     window.scrollTo(0, 0);
+  };
+  
+  // Handle file uploads for car photos
+  const handlePhotoUpload = (photoType: keyof typeof carPhotos, file: File | null) => {
+    setCarPhotos(prev => ({
+      ...prev,
+      [photoType]: file
+    }));
+    
+    if (file) {
+      toast({
+        title: "Photo uploaded",
+        description: `${photoType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} photo has been uploaded successfully.`,
+      });
+    }
+  };
+  
+  // Handle file uploads for documents
+  const handleDocumentUpload = (docType: keyof typeof documents, file: File | null) => {
+    setDocuments(prev => ({
+      ...prev,
+      [docType]: file
+    }));
+    
+    if (file) {
+      toast({
+        title: "Document uploaded",
+        description: `${docType === 'rc' ? 'RC' : docType.replace(/^./, str => str.toUpperCase())} document has been uploaded successfully.`,
+      });
+    }
+  };
+  
+  // Function to simulate file upload
+  const uploadFile = (e: React.ChangeEvent<HTMLInputElement>, type: string, uploadHandler: (type: any, file: File | null) => void) => {
+    const file = e.target.files?.[0] || null;
+    if (file) {
+      setUploading(true);
+      
+      // Simulate upload delay
+      setTimeout(() => {
+        uploadHandler(type, file);
+        setUploading(false);
+      }, 1000);
+    }
   };
 
   // Mock data for dropdowns
@@ -67,6 +180,24 @@ const SellCar = () => {
   const transmissions = ['Automatic', 'Manual', 'Semi-Automatic', 'CVT'];
   const states = ['Maharashtra', 'Delhi', 'Tamil Nadu', 'Karnataka', 'Uttar Pradesh', 'Gujarat', 'West Bengal'];
   const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Kolkata', 'Pune', 'Ahmedabad'];
+
+  // Define photo types for upload step
+  const photoTypes = [
+    { key: 'frontView', label: 'Front View' },
+    { key: 'sideView', label: 'Side View' },
+    { key: 'rearView', label: 'Rear View' },
+    { key: 'interior', label: 'Interior' },
+    { key: 'dashboard', label: 'Dashboard' },
+    { key: 'seats', label: 'Seats' }
+  ];
+  
+  // Define document types for upload step
+  const documentTypes = [
+    { key: 'rc', label: 'RC (Registration Certificate)' },
+    { key: 'insurance', label: 'Insurance Policy' },
+    { key: 'puc', label: 'PUC Certificate' },
+    { key: 'service', label: 'Service History' }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -390,13 +521,42 @@ const SellCar = () => {
                 <p className="text-gray-600 mb-4">Upload clear photos of your car from different angles</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {['Front View', 'Side View', 'Rear View', 'Interior', 'Dashboard', 'Seats'].map((view, index) => (
-                    <div key={index} className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center h-40">
-                      <Camera className="h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-sm font-medium text-gray-700">{view}</p>
-                      <Button variant="ghost" size="sm" className="mt-2">
-                        <Upload className="h-4 w-4 mr-1" /> Upload
-                      </Button>
+                  {photoTypes.map((item) => (
+                    <div 
+                      key={item.key} 
+                      className={`border-2 ${carPhotos[item.key as keyof typeof carPhotos] ? 'border-green-300 bg-green-50' : 'border-dashed border-gray-300'} rounded-lg p-4 flex flex-col items-center justify-center h-40`}
+                    >
+                      {carPhotos[item.key as keyof typeof carPhotos] ? (
+                        <>
+                          <CheckCircle className="h-8 w-8 text-green-500 mb-2" />
+                          <p className="text-sm font-medium text-gray-700">{item.label}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {(carPhotos[item.key as keyof typeof carPhotos] as File)?.name.slice(0, 15)}
+                            {(carPhotos[item.key as keyof typeof carPhotos] as File)?.name.length > 15 ? '...' : ''}
+                          </p>
+                          <label htmlFor={`photo-${item.key}`} className="mt-2">
+                            <span className="text-xs text-blue-600 cursor-pointer hover:underline">Change</span>
+                          </label>
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm font-medium text-gray-700">{item.label}</p>
+                          <label 
+                            htmlFor={`photo-${item.key}`}
+                            className="mt-2 px-3 py-1.5 bg-blue-50 text-blue-600 text-sm rounded-md hover:bg-blue-100 transition cursor-pointer flex items-center"
+                          >
+                            <Upload className="h-4 w-4 mr-1" /> Upload
+                          </label>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        id={`photo-${item.key}`}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => uploadFile(e, item.key, handlePhotoUpload)}
+                      />
                     </div>
                   ))}
                 </div>
@@ -407,17 +567,52 @@ const SellCar = () => {
                 <p className="text-gray-600 mb-4">Upload clear photos of your car documents</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {['RC (Registration Certificate)', 'Insurance Policy', 'PUC Certificate', 'Service History'].map((doc, index) => (
-                    <div key={index} className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center h-32">
-                      <FileText className="h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-sm font-medium text-gray-700">{doc}</p>
-                      <Button variant="ghost" size="sm" className="mt-2">
-                        <Upload className="h-4 w-4 mr-1" /> Upload
-                      </Button>
+                  {documentTypes.map((doc) => (
+                    <div 
+                      key={doc.key} 
+                      className={`border-2 ${documents[doc.key as keyof typeof documents] ? 'border-green-300 bg-green-50' : 'border-dashed border-gray-300'} rounded-lg p-4 flex flex-col items-center justify-center h-32`}
+                    >
+                      {documents[doc.key as keyof typeof documents] ? (
+                        <>
+                          <CheckCircle className="h-8 w-8 text-green-500 mb-2" />
+                          <p className="text-sm font-medium text-gray-700">{doc.label}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {(documents[doc.key as keyof typeof documents] as File)?.name.slice(0, 15)}
+                            {(documents[doc.key as keyof typeof documents] as File)?.name.length > 15 ? '...' : ''}
+                          </p>
+                          <label htmlFor={`doc-${doc.key}`} className="mt-2">
+                            <span className="text-xs text-blue-600 cursor-pointer hover:underline">Change</span>
+                          </label>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm font-medium text-gray-700">{doc.label}</p>
+                          <label 
+                            htmlFor={`doc-${doc.key}`}
+                            className="mt-2 px-3 py-1.5 bg-blue-50 text-blue-600 text-sm rounded-md hover:bg-blue-100 transition cursor-pointer flex items-center"
+                          >
+                            <Upload className="h-4 w-4 mr-1" /> Upload
+                          </label>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        id={`doc-${doc.key}`}
+                        className="hidden"
+                        accept=".pdf,image/*"
+                        onChange={(e) => uploadFile(e, doc.key, handleDocumentUpload)}
+                      />
                     </div>
                   ))}
                 </div>
               </div>
+              
+              {uploading && (
+                <div className="text-center py-2">
+                  <div className="animate-pulse text-blue-600">Uploading...</div>
+                </div>
+              )}
               
               <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4">
                 <Button 
