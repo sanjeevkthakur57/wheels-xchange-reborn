@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -247,7 +246,6 @@ const BuyCar = () => {
   });
 
   useEffect(() => {
-    // In a real app, this would be an API call with filters
     setCars(mockCars);
     filterCars();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -290,7 +288,6 @@ const BuyCar = () => {
       result = result.filter(car => car.featured);
     }
     
-    // Apply sorting
     switch (sortBy) {
       case 'price-low-high':
         result.sort((a, b) => a.price - b.price);
@@ -308,7 +305,6 @@ const BuyCar = () => {
         result.sort((a, b) => a.mileage - b.mileage);
         break;
       default:
-        // relevance - no specific sort
         break;
     }
     
@@ -339,7 +335,6 @@ const BuyCar = () => {
     });
   };
 
-  // Mock data for dropdowns
   const makes = ['Honda', 'Toyota', 'Hyundai', 'Maruti Suzuki', 'Tata', 'Mahindra', 'Ford', 'Mercedes-Benz', 'Audi', 'BMW', 'Volkswagen'];
   const fuelTypes = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'];
   const bodyTypes = ['Sedan', 'SUV', 'Hatchback', 'Coupe', 'Convertible', 'Wagon'];
@@ -363,7 +358,6 @@ const BuyCar = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Filter sidebar - desktop */}
           <div className={`md:w-1/4 bg-white p-6 rounded-lg shadow-sm hidden md:block`}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Filters</h2>
@@ -383,7 +377,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select brand" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Makes</SelectItem>
+                    <SelectItem value="all_makes">All Makes</SelectItem>
                     {makes.map(make => (
                       <SelectItem key={make} value={make}>{make}</SelectItem>
                     ))}
@@ -427,7 +421,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select fuel type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Fuel Types</SelectItem>
+                    <SelectItem value="all_fuel_types">All Fuel Types</SelectItem>
                     {fuelTypes.map(fuel => (
                       <SelectItem key={fuel} value={fuel}>{fuel}</SelectItem>
                     ))}
@@ -445,7 +439,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select body type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Body Types</SelectItem>
+                    <SelectItem value="all_body_types">All Body Types</SelectItem>
                     {bodyTypes.map(body => (
                       <SelectItem key={body} value={body}>{body}</SelectItem>
                     ))}
@@ -463,7 +457,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select transmission" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Transmissions</SelectItem>
+                    <SelectItem value="all_transmissions">All Transmissions</SelectItem>
                     {transmissions.map(transmission => (
                       <SelectItem key={transmission} value={transmission}>{transmission}</SelectItem>
                     ))}
@@ -484,7 +478,6 @@ const BuyCar = () => {
             </div>
           </div>
           
-          {/* Filter sidebar - mobile */}
           {isFilterOpen && (
             <div className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 md:hidden" onClick={toggleFilter}></div>
           )}
@@ -510,7 +503,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select brand" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Makes</SelectItem>
+                    <SelectItem value="all_makes">All Makes</SelectItem>
                     {makes.map(make => (
                       <SelectItem key={make} value={make}>{make}</SelectItem>
                     ))}
@@ -554,7 +547,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select fuel type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Fuel Types</SelectItem>
+                    <SelectItem value="all_fuel_types">All Fuel Types</SelectItem>
                     {fuelTypes.map(fuel => (
                       <SelectItem key={fuel} value={fuel}>{fuel}</SelectItem>
                     ))}
@@ -572,7 +565,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select body type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Body Types</SelectItem>
+                    <SelectItem value="all_body_types">All Body Types</SelectItem>
                     {bodyTypes.map(body => (
                       <SelectItem key={body} value={body}>{body}</SelectItem>
                     ))}
@@ -590,7 +583,7 @@ const BuyCar = () => {
                     <SelectValue placeholder="Select transmission" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Transmissions</SelectItem>
+                    <SelectItem value="all_transmissions">All Transmissions</SelectItem>
                     {transmissions.map(transmission => (
                       <SelectItem key={transmission} value={transmission}>{transmission}</SelectItem>
                     ))}
@@ -620,7 +613,6 @@ const BuyCar = () => {
             </div>
           </div>
           
-          {/* Results section */}
           <div className="md:w-3/4">
             <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
