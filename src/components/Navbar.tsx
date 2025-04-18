@@ -47,12 +47,16 @@ const Navbar = () => {
                 placeholder="Search cars..."
               />
             </div>
-            <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-              Login
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              Sign Up
-            </Button>
+            <Link to="/login">
+              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                Login
+              </Button>
+            </Link>
+            <Link to="/signup">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Sign Up
+              </Button>
+            </Link>
           </div>
 
           <div className="flex md:hidden items-center">
@@ -96,12 +100,16 @@ const Navbar = () => {
                 placeholder="Search cars..."
               />
             </div>
-            <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 w-full">
-              Login
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">
-              Sign Up
-            </Button>
+            <Link to="/login">
+              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50 w-full">
+                Login
+              </Button>
+            </Link>
+            <Link to="/signup">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
