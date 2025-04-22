@@ -1,36 +1,52 @@
-
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Car, Zap, BarChart2, TrendingUp, ArrowUp, ArrowDown } from 'lucide-react';
+import { cars as carsApi } from '@/services/api';
+import { users } from '@/services/api';
 
 interface DatabaseStatsProps {
   loading: boolean;
 }
 
-const DatabaseStats = ({ loading }: DatabaseStatsProps) => {
-  // Mock data - in a real app, this would come from your API
-  const stats = {
-    totalCars: 247,
-    pendingApproval: 32,
-    approved: 178,
-    rejected: 12,
-    sold: 25,
-    recentSales: [
-      { month: 'Jan', count: 3 },
-      { month: 'Feb', count: 5 },
-      { month: 'Mar', count: 4 },
-      { month: 'Apr', count: 6 },
-      { month: 'May', count: 7 },
-    ],
-    popularMakes: [
-      { make: 'Honda', percentage: 25 },
-      { make: 'Toyota', percentage: 22 },
-      { make: 'Maruti Suzuki', percentage: 18 },
-      { make: 'Hyundai', percentage: 15 },
-      { make: 'Tata', percentage: 10 },
-    ]
-  };
+const DatabaseStats = ({ loading: externalLoading }: DatabaseStatsProps) => {
+  const [stats, setStats] = useState({
+    totalCars: 0,
+    pendingApproval: 0,
+    approved: 0,
+    rejected: 0,
+    sold: 0,
+    totalUsers: 0
+  });
+  const [loading, setLoading] = useState(externalLoading || true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [carsList, usersList] = await Promise.all([
+          carsApi.getAll(),
+          users.getAllUsers()
+        ]);
+
+        setStats({
+          totalCars: carsList.length,
+          pendingApproval: carsList.filter(car => car.status === 'pending').length,
+          approved: carsList.filter(car => car.status === 'approved').length,
+          rejected: carsList.filter(car => car.status === 'rejected').length,
+          sold: carsList.filter(car => car.status === 'sold').length,
+          totalUsers: usersList.length
+        });
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch stats', error);
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   if (loading) {
     return (

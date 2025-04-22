@@ -70,4 +70,22 @@ export const cars = {
   }
 };
 
+export const users = {
+  getCurrentUser: async () => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      return JSON.parse(userJson);
+    }
+    
+    // Optional: Fetch fresh user data from backend if needed
+    const response = await api.get('/users/profile');
+    return response.data;
+  },
+
+  getAllUsers: async () => {
+    const response = await api.get('/users');
+    return response.data;
+  }
+};
+
 export default api;

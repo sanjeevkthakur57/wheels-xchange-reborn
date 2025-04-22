@@ -1,12 +1,12 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
-import { cars as carsApi } from '@/services/api';  // Rename import to avoid conflict
+import { cars as carsApi } from '@/services/api';
+import CarDetailsModal from './CarDetailsModal';
 
 interface Car {
   _id: string;
@@ -16,7 +16,6 @@ interface Car {
   registrationNumber: string;
   seller: {
     name: string;
-    // Add phone if available in your User model
   };
   status: 'pending' | 'approved' | 'rejected' | 'sold';
   createdAt: string;
@@ -25,7 +24,7 @@ interface Car {
 interface CarListingTableProps {
   searchTerm: string;
   statusFilter: string;
-  loading?: boolean; // Add optional loading prop
+  loading?: boolean;
 }
 
 const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }: CarListingTableProps) => {
@@ -33,6 +32,7 @@ const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }:
   const [carsList, setCarsList] = useState<Car[]>([]);
   const [loading, setLoading] = useState(externalLoading || true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -72,7 +72,10 @@ const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }:
     }
   };
 
-  // Filtering logic stays the same as in the previous implementation
+  const handleViewDetails = (car: Car) => {
+    setSelectedCar(car);
+  };
+
   const filteredCars = carsList.filter(car => {
     const matchesSearch = 
       car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,7 +144,6 @@ const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }:
                 <TableCell>
                   <div>
                     <div>{car.seller.name}</div>
-                    {/* <div className="text-sm text-gray-500">{car.sellerInfo.phone}</div> */}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -154,7 +156,11 @@ const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }:
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button size="icon" variant="outline">
+                    <Button 
+                      size="icon" 
+                      variant="outline" 
+                      onClick={() => handleViewDetails(car)}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
                     <Button size="icon" variant="outline">
@@ -175,6 +181,11 @@ const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }:
           )}
         </TableBody>
       </Table>
+      <CarDetailsModal 
+        car={selectedCar} 
+        isOpen={!!selectedCar} 
+        onClose={() => setSelectedCar(null)} 
+      />
     </div>
   );
 };
