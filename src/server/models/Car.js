@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const CarSchema = new mongoose.Schema({
@@ -62,6 +61,13 @@ const CarSchema = new mongoose.Schema({
   description: {
     type: String
   },
+  
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  
   photos: {
     frontView: String,
     sideView: String,
@@ -70,30 +76,14 @@ const CarSchema = new mongoose.Schema({
     dashboard: String,
     seats: String
   },
+  
   documents: {
     rc: String,
     insurance: String,
     puc: String,
     service: String
   },
-  sellerInfo: {
-    name: {
-      type: String,
-      required: true
-    },
-    email: {
-      type: String,
-      required: true
-    },
-    phone: {
-      type: String,
-      required: true
-    },
-    city: {
-      type: String,
-      required: true
-    }
-  },
+  
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected', 'sold'],
