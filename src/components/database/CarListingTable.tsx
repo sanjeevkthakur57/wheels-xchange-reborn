@@ -1,116 +1,81 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import { cars } from '@/services/api';  // Import the cars service
 
 interface Car {
-  id: string;
+  _id: string;
   make: string;
   model: string;
   year: string;
   registrationNumber: string;
-  sellerInfo: {
+  seller: {
     name: string;
-    phone: string;
+    // Add phone if available in your User model
   };
   status: 'pending' | 'approved' | 'rejected' | 'sold';
   createdAt: string;
 }
 
 interface CarListingTableProps {
-  loading: boolean;
   searchTerm: string;
   statusFilter: string;
 }
 
-const CarListingTable = ({ loading, searchTerm, statusFilter }: CarListingTableProps) => {
+const CarListingTable = ({ searchTerm, statusFilter }: CarListingTableProps) => {
   const { toast } = useToast();
-  
-  // Mock data - in a real app, this would come from your API
-  const [cars, setCars] = useState<Car[]>([
-    {
-      id: '1',
-      make: 'Honda',
-      model: 'City',
-      year: '2020',
-      registrationNumber: 'MH01AB1234',
-      sellerInfo: {
-        name: 'John Doe',
-        phone: '9876543210',
-      },
-      status: 'pending',
-      createdAt: '2023-05-15T10:30:00',
-    },
-    {
-      id: '2',
-      make: 'Toyota',
-      model: 'Fortuner',
-      year: '2019',
-      registrationNumber: 'DL01CD5678',
-      sellerInfo: {
-        name: 'Jane Smith',
-        phone: '8765432109',
-      },
-      status: 'approved',
-      createdAt: '2023-04-22T14:15:00',
-    },
-    {
-      id: '3',
-      make: 'Maruti Suzuki',
-      model: 'Swift',
-      year: '2021',
-      registrationNumber: 'KA01EF9012',
-      sellerInfo: {
-        name: 'Robert Johnson',
-        phone: '7654321098',
-      },
-      status: 'rejected',
-      createdAt: '2023-06-05T09:45:00',
-    },
-    {
-      id: '4',
-      make: 'Hyundai',
-      model: 'Creta',
-      year: '2018',
-      registrationNumber: 'TN01GH3456',
-      sellerInfo: {
-        name: 'Emily Williams',
-        phone: '6543210987',
-      },
-      status: 'sold',
-      createdAt: '2023-03-10T16:20:00',
-    },
-  ]);
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleDeleteCar = (id: string) => {
-    setCars(cars.filter(car => car.id !== id));
-    toast({
-      title: "Car deleted",
-      description: `Car listing with ID ${id} has been deleted.`,
-    });
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        setLoading(true);
+        const fetchedCars = await cars.getAll();
+        setCars(fetchedCars);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch cars');
+        setLoading(false);
+        toast({
+          title: 'Error',
+          description: 'Unable to fetch car listings',
+          variant: 'destructive'
+        });
+      }
+    };
+
+    fetchCars();
+  }, []);
+
+  const handleDeleteCar = async (id: string) => {
+    try {
+      await cars.delete(id);  // Add delete method to cars service
+      setCars(cars.filter(car => car._id !== id));
+      toast({
+        title: "Car deleted",
+        description: `Car listing has been deleted.`,
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to delete car listing",
+        variant: 'destructive'
+      });
+    }
   };
 
-  const handleUpdateStatus = (id: string, newStatus: 'pending' | 'approved' | 'rejected' | 'sold') => {
-    setCars(cars.map(car => 
-      car.id === id ? { ...car, status: newStatus } : car
-    ));
-    toast({
-      title: "Status updated",
-      description: `Car listing status has been updated to ${newStatus}.`,
-    });
-  };
-
-  // Filter cars based on search term and status filter
+  // Filtering logic stays the same as in the previous implementation
   const filteredCars = cars.filter(car => {
     const matchesSearch = 
       car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      car.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      car.sellerInfo.name.toLowerCase().includes(searchTerm.toLowerCase());
+      car.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || car.status === statusFilter;
     
@@ -163,7 +128,7 @@ const CarListingTable = ({ loading, searchTerm, statusFilter }: CarListingTableP
             </TableRow>
           ) : (
             filteredCars.map((car) => (
-              <TableRow key={car.id}>
+              <TableRow key={car._id}>
                 <TableCell>
                   <div>
                     <div className="font-medium">{car.make} {car.model}</div>
@@ -173,8 +138,8 @@ const CarListingTable = ({ loading, searchTerm, statusFilter }: CarListingTableP
                 <TableCell>{car.registrationNumber}</TableCell>
                 <TableCell>
                   <div>
-                    <div>{car.sellerInfo.name}</div>
-                    <div className="text-sm text-gray-500">{car.sellerInfo.phone}</div>
+                    <div>{car.seller.name}</div>
+                    {/* <div className="text-sm text-gray-500">{car.sellerInfo.phone}</div> */}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -197,7 +162,7 @@ const CarListingTable = ({ loading, searchTerm, statusFilter }: CarListingTableP
                       size="icon" 
                       variant="outline" 
                       className="text-red-500"
-                      onClick={() => handleDeleteCar(car.id)}
+                      onClick={() => handleDeleteCar(car._id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

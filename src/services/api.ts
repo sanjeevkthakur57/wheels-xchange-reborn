@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
@@ -62,6 +61,11 @@ export const cars = {
   
   getById: async (id: string) => {
     const response = await api.get(`/cars/${id}`);
+    return response.data;
+  },
+  
+  delete: async (id: string) => {
+    const response = await api.delete(`/cars/${id}`);
     return response.data;
   }
 };
