@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
-import { cars } from '@/services/api';  // Import the cars service
+import { cars as carsApi } from '@/services/api';  // Rename import to avoid conflict
 
 interface Car {
   _id: string;
@@ -24,20 +25,21 @@ interface Car {
 interface CarListingTableProps {
   searchTerm: string;
   statusFilter: string;
+  loading?: boolean; // Add optional loading prop
 }
 
-const CarListingTable = ({ searchTerm, statusFilter }: CarListingTableProps) => {
+const CarListingTable = ({ searchTerm, statusFilter, loading: externalLoading }: CarListingTableProps) => {
   const { toast } = useToast();
-  const [cars, setCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [carsList, setCarsList] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(externalLoading || true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCars = async () => {
       try {
         setLoading(true);
-        const fetchedCars = await cars.getAll();
-        setCars(fetchedCars);
+        const fetchedCars = await carsApi.getAll();
+        setCarsList(fetchedCars);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch cars');
@@ -55,8 +57,8 @@ const CarListingTable = ({ searchTerm, statusFilter }: CarListingTableProps) => 
 
   const handleDeleteCar = async (id: string) => {
     try {
-      await cars.delete(id);  // Add delete method to cars service
-      setCars(cars.filter(car => car._id !== id));
+      await carsApi.delete(id);
+      setCarsList(carsList.filter(car => car._id !== id));
       toast({
         title: "Car deleted",
         description: `Car listing has been deleted.`,
@@ -71,7 +73,7 @@ const CarListingTable = ({ searchTerm, statusFilter }: CarListingTableProps) => 
   };
 
   // Filtering logic stays the same as in the previous implementation
-  const filteredCars = cars.filter(car => {
+  const filteredCars = carsList.filter(car => {
     const matchesSearch = 
       car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -5,11 +5,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Database, Search, Filter, Edit, Trash2, Eye, RefreshCw } from 'lucide-react';
+import { Database, Search, Filter, RefreshCw } from 'lucide-react';
 import CarListingTable from '@/components/database/CarListingTable';
 import DatabaseStats from '@/components/database/DatabaseStats';
 
@@ -100,7 +99,11 @@ const DatabasePage = () => {
                 </div>
               </div>
               
-              <CarListingTable loading={loading} searchTerm={searchTerm} statusFilter={statusFilter} />
+              <CarListingTable 
+                searchTerm={searchTerm} 
+                statusFilter={statusFilter} 
+                loading={loading} 
+              />
             </Card>
           </TabsContent>
           
