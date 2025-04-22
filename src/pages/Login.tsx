@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, LogIn, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { auth } from "@/services/api";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -33,18 +33,23 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    // This would be replaced with actual authentication logic
-    console.log("Login form submitted:", data);
-    
-    // Show success toast for demo purposes
-    toast({
-      title: "Login Successful",
-      description: "Welcome back to WheelsXchange!",
-    });
-    
-    // Navigate to home page after login
-    navigate("/");
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      await auth.login(data.email, data.password);
+      
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to WheelsXchange!",
+      });
+      
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.response?.data?.message || "An error occurred during login",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

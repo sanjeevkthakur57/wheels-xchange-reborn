@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, UserPlus, Mail, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { auth } from "@/services/api";
 
 const signupSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -41,18 +41,23 @@ const Signup = () => {
     },
   });
 
-  const onSubmit = (data: SignupFormValues) => {
-    // This would be replaced with actual registration logic
-    console.log("Signup form submitted:", data);
-    
-    // Show success toast for demo purposes
-    toast({
-      title: "Account created successfully",
-      description: "Welcome to WheelsXchange!",
-    });
-    
-    // Navigate to home page after signup
-    navigate("/");
+  const onSubmit = async (data: SignupFormValues) => {
+    try {
+      await auth.register(data.name, data.email, data.password);
+      
+      toast({
+        title: "Account created successfully",
+        description: "Welcome to WheelsXchange!",
+      });
+      
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.message || "An error occurred during registration",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

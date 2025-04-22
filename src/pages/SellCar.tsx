@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
@@ -9,6 +8,7 @@ import ContactForm from '@/components/sell-car/ContactForm';
 import SuccessMessage from '@/components/sell-car/SuccessMessage';
 import WhyChooseUs from '@/components/sell-car/WhyChooseUs';
 import { CheckCircle } from 'lucide-react';
+import { cars } from '@/services/api';
 
 const SellCar = () => {
   const [step, setStep] = useState(1);
@@ -91,7 +91,7 @@ const SellCar = () => {
     window.scrollTo(0, 0);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const requiredContactFields = ['name', 'email', 'phone', 'city'];
     const missingFields = requiredContactFields.filter(field => !formData[field as keyof typeof formData]);
@@ -105,17 +105,41 @@ const SellCar = () => {
       return;
     }
     
-    console.log('Form data submitted:', formData);
-    console.log('Car photos:', carPhotos);
-    console.log('Documents:', documents);
-    
-    toast({
-      title: "Submission successful",
-      description: "Your car details have been submitted successfully!",
-    });
-    
-    setStep(4);
-    window.scrollTo(0, 0);
+    try {
+      const formDataToSend = new FormData();
+      
+      Object.keys(formData).forEach(key => {
+        formDataToSend.append(key, formData[key as keyof typeof formData]);
+      });
+      
+      Object.keys(carPhotos).forEach(key => {
+        if (carPhotos[key as keyof typeof carPhotos]) {
+          formDataToSend.append(key, carPhotos[key as keyof typeof carPhotos] as File);
+        }
+      });
+      
+      Object.keys(documents).forEach(key => {
+        if (documents[key as keyof typeof documents]) {
+          formDataToSend.append(key, documents[key as keyof typeof documents] as File);
+        }
+      });
+      
+      await cars.create(formDataToSend);
+      
+      toast({
+        title: "Submission successful",
+        description: "Your car details have been submitted successfully!",
+      });
+      
+      setStep(4);
+      window.scrollTo(0, 0);
+    } catch (error: any) {
+      toast({
+        title: "Submission Failed",
+        description: error.response?.data?.message || "An error occurred while submitting your car details",
+        variant: "destructive",
+      });
+    }
   };
   
   const handlePhotoUpload = (photoType: keyof typeof carPhotos, file: File | null) => {
@@ -146,7 +170,6 @@ const SellCar = () => {
     }
   };
 
-  // Mock data
   const makes = ['Honda', 'Toyota', 'Hyundai', 'Maruti Suzuki', 'Tata', 'Mahindra', 'Ford', 'Mercedes-Benz', 'Audi', 'BMW', 'Volkswagen'];
   const years = Array.from({ length: 20 }, (_, i) => (new Date().getFullYear() - i).toString());
   const fuelTypes = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'];
@@ -181,7 +204,6 @@ const SellCar = () => {
           <p className="text-gray-600">Get the best value for your car with our hassle-free process</p>
         </div>
         
-        {/* Progress Steps */}
         <div className="mb-10 hidden sm:block">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             {[1, 2, 3, 4].map((s) => (
