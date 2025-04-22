@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -42,6 +44,7 @@ const Signup = () => {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
+    setIsLoading(true);
     try {
       await auth.register(data.name, data.email, data.password);
       
@@ -52,11 +55,15 @@ const Signup = () => {
       
       navigate("/");
     } catch (error: any) {
+      console.error("Registration error:", error);
+      
       toast({
         title: "Registration Failed",
-        description: error.response?.data?.message || "An error occurred during registration",
+        description: error.friendlyMessage || "This email may already be in use",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -186,9 +193,17 @@ const Signup = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full flex items-center justify-center">
-                <UserPlus className="mr-2 h-5 w-5" />
-                Create account
+              <Button 
+                type="submit" 
+                className="w-full flex items-center justify-center"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className="mr-2">Please wait...</span>
+                ) : (
+                  <UserPlus className="mr-2 h-5 w-5" />
+                )}
+                {isLoading ? 'Creating account...' : 'Create account'}
               </Button>
 
               <div className="text-center mt-4">

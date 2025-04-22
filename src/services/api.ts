@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
@@ -19,28 +20,59 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Error handling interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Create a more user-friendly error message
+    const errorMessage = error.response?.data?.message || 'An error occurred';
+    error.friendlyMessage = errorMessage;
+    return Promise.reject(error);
+  }
+);
+
 export const auth = {
   login: async (email: string, password: string) => {
-    const response = await api.post('/users/login', { email, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    try {
+      const response = await api.post('/users/login', { email, password });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+      return response.data;
+    } catch (error) {
+      throw error;
     }
-    return response.data;
   },
   
   register: async (name: string, email: string, password: string) => {
-    const response = await api.post('/users/register', { name, email, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    try {
+      const response = await api.post('/users/register', { name, email, password });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+      return response.data;
+    } catch (error) {
+      throw error;
     }
-    return response.data;
   },
   
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+  },
+  
+  getCurrentUser: () => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      return JSON.parse(userJson);
+    }
+    return null;
+  },
+  
+  isAuthenticated: () => {
+    return !!localStorage.getItem('token');
   }
 };
 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -34,6 +36,7 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
     try {
       await auth.login(data.email, data.password);
       
@@ -44,11 +47,15 @@ const Login = () => {
       
       navigate("/");
     } catch (error: any) {
+      console.error("Login error:", error);
+      
       toast({
         title: "Login Failed",
-        description: error.response?.data?.message || "An error occurred during login",
+        description: error.friendlyMessage || "Invalid email or password",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -129,9 +136,17 @@ const Login = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full flex items-center justify-center">
-                <LogIn className="mr-2 h-5 w-5" />
-                Sign in
+              <Button 
+                type="submit" 
+                className="w-full flex items-center justify-center"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className="mr-2">Please wait...</span>
+                ) : (
+                  <LogIn className="mr-2 h-5 w-5" />
+                )}
+                {isLoading ? 'Signing in...' : 'Sign in'}
               </Button>
 
               <div className="text-center mt-4">
