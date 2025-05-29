@@ -19,11 +19,17 @@ const ContactForm = ({
   handleSubmit,
   cities
 }: ContactFormProps) => {
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted with data:', formData);
+    handleSubmit(e);
+  };
+
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
       <h2 className="text-xl font-semibold mb-6">Contact Information</h2>
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name <span className="text-red-500">*</span></label>
@@ -64,7 +70,6 @@ const ContactForm = ({
             <Select
               value={formData.city || ''}
               onValueChange={(value) => handleChange('city', value)}
-              required
             >
               <SelectTrigger id="city">
                 <SelectValue placeholder="Select city" />
