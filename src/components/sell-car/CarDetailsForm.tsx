@@ -64,7 +64,6 @@ const CarDetailsForm = ({
             />
           </div>
           
-          {/* Year Select */}
           <div>
             <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">Year <span className="text-red-500">*</span></label>
             <Select
@@ -83,7 +82,6 @@ const CarDetailsForm = ({
             </Select>
           </div>
 
-          {/* Other form fields */}
           <div>
             <label htmlFor="fuel" className="block text-sm font-medium text-gray-700 mb-1">Fuel Type <span className="text-red-500">*</span></label>
             <Select
@@ -226,7 +224,48 @@ const CarDetailsForm = ({
               onChange={(e) => handleChange('color', e.target.value)}
             />
           </div>
+        </div>
+        
+        {/* Insurance Section */}
+        <div className="space-y-4 border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900">Insurance Information</h3>
           
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Insurance Status <span className="text-red-500">*</span></label>
+            <RadioGroup
+              defaultValue="yes"
+              value={formData.insurance}
+              onValueChange={(value) => handleChange('insurance', value)}
+            >
+              <div className="flex space-x-6">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="insurance-yes" />
+                  <Label htmlFor="insurance-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="insurance-no" />
+                  <Label htmlFor="insurance-no">No</Label>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+          
+          {formData.insurance === 'yes' && (
+            <div>
+              <label htmlFor="insuranceValidity" className="block text-sm font-medium text-gray-700 mb-1">Insurance Validity <span className="text-red-500">*</span></label>
+              <Input 
+                id="insuranceValidity"
+                type="date"
+                value={formData.insuranceValidity}
+                onChange={(e) => handleChange('insuranceValidity', e.target.value)}
+                required={formData.insurance === 'yes'}
+              />
+            </div>
+          )}
+        </div>
+        
+        {/* Price and Description */}
+        <div className="grid grid-cols-1 gap-6 border-t pt-6">
           <div>
             <label htmlFor="expectedPrice" className="block text-sm font-medium text-gray-700 mb-1">Expected Price (₹) <span className="text-red-500">*</span></label>
             <Input 
@@ -236,6 +275,17 @@ const CarDetailsForm = ({
               value={formData.expectedPrice}
               onChange={(e) => handleChange('expectedPrice', e.target.value)}
               required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Additional Description</label>
+            <Textarea 
+              id="description"
+              placeholder="Describe any additional features, condition details, or special notes about your car..."
+              rows={4}
+              value={formData.description}
+              onChange={(e) => handleChange('description', e.target.value)}
             />
           </div>
         </div>
