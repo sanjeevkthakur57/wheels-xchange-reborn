@@ -30,7 +30,7 @@ const ContactForm = ({
             <Input 
               id="name"
               placeholder="Your full name"
-              value={formData.name}
+              value={formData.name || ''}
               onChange={(e) => handleChange('name', e.target.value)}
               required
             />
@@ -42,7 +42,7 @@ const ContactForm = ({
               id="email"
               type="email"
               placeholder="Your email address"
-              value={formData.email}
+              value={formData.email || ''}
               onChange={(e) => handleChange('email', e.target.value)}
               required
             />
@@ -53,7 +53,7 @@ const ContactForm = ({
             <Input 
               id="phone"
               placeholder="Your phone number"
-              value={formData.phone}
+              value={formData.phone || ''}
               onChange={(e) => handleChange('phone', e.target.value)}
               required
             />
@@ -62,7 +62,7 @@ const ContactForm = ({
           <div>
             <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-500">*</span></label>
             <Select
-              value={formData.city}
+              value={formData.city || ''}
               onValueChange={(value) => handleChange('city', value)}
               required
             >
