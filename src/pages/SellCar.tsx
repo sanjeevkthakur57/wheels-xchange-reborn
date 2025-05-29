@@ -60,7 +60,7 @@ const SellCar = () => {
 
   const handleNext = () => {
     if (step === 1) {
-      const requiredFields = ['make', 'model', 'year', 'fuel', 'transmission', 'bodyType', 'kilometers', 'registrationState', 'registrationNumber'];
+      const requiredFields = ['make', 'model', 'year', 'fuel', 'transmission', 'bodyType', 'kilometers', 'registrationState', 'registrationNumber', 'expectedPrice'];
       const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
       
       if (missingFields.length > 0) {
@@ -72,6 +72,7 @@ const SellCar = () => {
         return;
       }
       
+      // Check insurance validity only if insurance is 'yes'
       if (formData.insurance === 'yes' && !formData.insuranceValidity) {
         toast({
           title: "Missing information",
