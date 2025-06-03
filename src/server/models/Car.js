@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 
 const CarSchema = new mongoose.Schema({
@@ -60,6 +61,24 @@ const CarSchema = new mongoose.Schema({
   },
   description: {
     type: String
+  },
+  
+  // Contact information
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  phone: {
+    type: String,
+    required: true
+  },
+  city: {
+    type: String,
+    required: true
   },
   
   seller: {
