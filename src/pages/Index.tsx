@@ -1,7 +1,6 @@
 
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
-import CarSearch from '@/components/CarSearch';
 import FeaturedCars from '@/components/FeaturedCars';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
@@ -14,9 +13,6 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
-        <div className="relative z-20 mb-16">
-          <CarSearch />
-        </div>
         <FeaturedCars />
         <HowItWorks />
         <Testimonials />
