@@ -1,14 +1,22 @@
 
 const mongoose = require('mongoose');
-require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    // Replace this with your actual MongoDB Atlas connection string
+    // Format: mongodb+srv://username:password@cluster.mongodb.net/wheelsxchange
+    const mongoURI = process.env.MONGO_URI || 'mongodb+srv://your-username:your-password@your-cluster.mongodb.net/wheelsxchange?retryWrites=true&w=majority';
+    
+    const conn = await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    
+    console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
+    console.log(`Database: ${conn.connection.name}`);
     return conn;
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(`MongoDB Atlas Connection Error: ${error.message}`);
     process.exit(1);
   }
 };
