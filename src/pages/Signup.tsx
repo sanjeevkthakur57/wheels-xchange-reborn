@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,11 +7,9 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, UserPlus, Mail, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { auth } from "@/services/api";
 
 const signupSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -30,7 +27,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
   
   const form = useForm<SignupFormValues>({
@@ -43,33 +40,29 @@ const Signup = () => {
     },
   });
 
-  const onSubmit = async (data: SignupFormValues) => {
+  const onSubmit = async () => {
     setIsLoading(true);
-    try {
-      await auth.register(data.name, data.email, data.password);
-      
-      toast({
-        title: "Account created successfully",
-        description: "Welcome to WheelsXchange!",
-      });
-      
-      navigate("/");
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      
-      toast({
-        title: "Registration Failed",
-        description: error.friendlyMessage || "This email may already be in use",
-        variant: "destructive",
-      });
-    } finally {
+    setShowDialog(true);
+    setTimeout(() => {
+      setShowDialog(false);
       setIsLoading(false);
-    }
+      localStorage.setItem('fakeLoggedIn', 'true');
+      if (window.fakeLogin) window.fakeLogin();
+    }, 1500);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
+      {/* Signup Success Dialog */}
+      {showDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">Signed in</h3>
+            <p className="text-gray-600">Your account has been created and you are signed in!</p>
+          </div>
+        </div>
+      )}
       
       <div className="flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-md">

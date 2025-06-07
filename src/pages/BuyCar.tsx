@@ -676,8 +676,8 @@ const BuyCar = () => {
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCars.map((car) => (
-                  <Link to={`/car/${car.id}`} key={car.id}>
-                    <Card className="overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 h-full">
+                  <Card key={car.id} className="overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 h-full flex flex-col justify-between">
+                    <div>
                       <div className="relative h-48 overflow-hidden">
                         <img 
                           src={car.image} 
@@ -698,34 +698,36 @@ const BuyCar = () => {
                           <div>{car.mileage.toLocaleString()} km</div>
                           <div>{car.fuel}</div>
                         </div>
-                        <div className="mt-4 flex items-center justify-between">
+                        <div className="mt-4 flex justify-between items-center">
                           <div className="text-sm text-gray-500">{car.location}</div>
-                          <div className="text-sm font-medium text-blue-600">{car.transmission}</div>
+                          <Link to={`/car/${car.id}`}>
+                            <Button className="bg-blue-600 hover:bg-blue-700">View Details</Button>
+                          </Link>
                         </div>
                       </div>
-                    </Card>
-                  </Link>
+                    </div>
+                  </Card>
                 ))}
               </div>
             ) : (
               <div className="space-y-6">
                 {filteredCars.map((car) => (
-                  <Link to={`/car/${car.id}`} key={car.id}>
-                    <Card className="overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/3 relative">
-                          <img 
-                            src={car.image} 
-                            alt={car.title} 
-                            className="w-full h-60 md:h-full object-cover"
-                          />
-                          {car.featured && (
-                            <div className="absolute top-0 right-0 m-2">
-                              <Badge className="bg-blue-600 hover:bg-blue-700">Featured</Badge>
-                            </div>
-                          )}
-                        </div>
-                        <div className="md:w-2/3 p-6">
+                  <Card key={car.id} className="overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col md:flex-row">
+                      <div className="md:w-1/3 relative">
+                        <img 
+                          src={car.image} 
+                          alt={car.title} 
+                          className="w-full h-60 md:h-full object-cover"
+                        />
+                        {car.featured && (
+                          <div className="absolute top-0 right-0 m-2">
+                            <Badge className="bg-blue-600 hover:bg-blue-700">Featured</Badge>
+                          </div>
+                        )}
+                      </div>
+                      <div className="md:w-2/3 p-6 flex flex-col justify-between">
+                        <div>
                           <div className="flex justify-between items-start">
                             <div>
                               <h3 className="text-xl font-medium text-gray-900">{car.title}</h3>
@@ -733,9 +735,7 @@ const BuyCar = () => {
                             </div>
                             <p className="text-2xl font-bold text-blue-600">{formatPrice(car.price)}</p>
                           </div>
-                          
                           <p className="mt-4 text-gray-600 line-clamp-2">{car.description}</p>
-                          
                           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                               <p className="text-xs text-gray-500">Year</p>
@@ -754,15 +754,16 @@ const BuyCar = () => {
                               <p className="font-medium">{car.transmission}</p>
                             </div>
                           </div>
-                          
-                          <div className="mt-6 flex justify-between items-center">
-                            <div className="text-sm text-gray-500">{car.location}</div>
+                        </div>
+                        <div className="mt-6 flex justify-between items-center">
+                          <div className="text-sm text-gray-500">{car.location}</div>
+                          <Link to={`/car/${car.id}`}>
                             <Button className="bg-blue-600 hover:bg-blue-700">View Details</Button>
-                          </div>
+                          </Link>
                         </div>
                       </div>
-                    </Card>
-                  </Link>
+                    </div>
+                  </Card>
                 ))}
               </div>
             )}

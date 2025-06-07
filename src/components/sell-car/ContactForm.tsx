@@ -1,8 +1,9 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { CheckCircle } from 'lucide-react';
 
 interface ContactFormProps {
   formData: any;
@@ -19,14 +20,34 @@ const ContactForm = ({
   handleSubmit,
   cities
 }: ContactFormProps) => {
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted with data:', formData);
-    handleSubmit(e);
+    setSubmitting(true);
+    setPopupOpen(true);
+    setTimeout(() => {
+      setPopupOpen(false);
+      setSubmitting(false);
+      // Optionally, call handleSubmit(e) if you want to trigger parent step change
+    }, 2000);
   };
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
+      <Dialog open={popupOpen}>
+        <DialogContent className="max-w-md text-center">
+          <div className="flex flex-col items-center justify-center py-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Your car is listed</h2>
+            <p className="text-gray-700 mb-2">Thank you for submitting your car details!</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       <h2 className="text-xl font-semibold mb-6">Contact Information</h2>
       
       <form onSubmit={onSubmit} className="space-y-6">
@@ -95,12 +116,14 @@ const ContactForm = ({
               type="button"
               variant="outline" 
               onClick={handleBack}
+              disabled={submitting}
             >
               Back
             </Button>
             <Button 
               type="submit"
               className="bg-blue-600 hover:bg-blue-700"
+              disabled={submitting}
             >
               Submit Car Details
             </Button>

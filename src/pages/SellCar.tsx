@@ -9,6 +9,7 @@ import SuccessMessage from '@/components/sell-car/SuccessMessage';
 import WhyChooseUs from '@/components/sell-car/WhyChooseUs';
 import { CheckCircle } from 'lucide-react';
 import { cars } from '@/services/api';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 const SellCar = () => {
   const [step, setStep] = useState(1);
@@ -53,6 +54,8 @@ const SellCar = () => {
   });
   
   const [uploading, setUploading] = useState(false);
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -126,14 +129,13 @@ const SellCar = () => {
       });
       
       await cars.create(formDataToSend);
-      
-      toast({
-        title: "Submission successful",
-        description: "Your car details have been submitted successfully!",
-      });
-      
-      setStep(4);
-      window.scrollTo(0, 0);
+      setShowSubmitDialog(true);
+      setPopupMessage('Your car is listed');
+      setTimeout(() => {
+        setShowSubmitDialog(false);
+        setStep(4);
+        window.scrollTo(0, 0);
+      }, 2200);
     } catch (error: any) {
       toast({
         title: "Submission Failed",
@@ -198,6 +200,19 @@ const SellCar = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      
+      {/* Popup after contact submit */}
+      <Dialog open={showSubmitDialog}>
+        <DialogContent className="max-w-md text-center">
+          <div className="flex flex-col items-center justify-center py-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Thank you!</h2>
+            <p className="text-gray-700 mb-2">{popupMessage}</p>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-10">

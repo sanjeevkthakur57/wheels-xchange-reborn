@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, LogIn, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { auth } from "@/services/api";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -24,6 +22,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -35,33 +34,29 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async () => {
     setIsLoading(true);
-    try {
-      await auth.login(data.email, data.password);
-      
-      toast({
-        title: "Login Successful",
-        description: "Welcome back to WheelsXchange!",
-      });
-      
-      navigate("/");
-    } catch (error: any) {
-      console.error("Login error:", error);
-      
-      toast({
-        title: "Login Failed",
-        description: error.friendlyMessage || "Invalid email or password",
-        variant: "destructive",
-      });
-    } finally {
+    setShowDialog(true);
+    setTimeout(() => {
+      setShowDialog(false);
       setIsLoading(false);
-    }
+      localStorage.setItem('fakeLoggedIn', 'true');
+      if (window.fakeLogin) window.fakeLogin();
+    }, 1500);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
+      {/* Login Success Dialog */}
+      {showDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">Logged in</h3>
+            <p className="text-gray-600">You have successfully logged in!</p>
+          </div>
+        </div>
+      )}
       
       <div className="flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-md">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -25,6 +24,7 @@ import {
   XCircle, 
   PhoneCall 
 } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface Car {
   id: string;
@@ -214,6 +214,8 @@ const CarDetail = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [isWishlist, setIsWishlist] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   useEffect(() => {
     // In a real app, this would be an API call
@@ -251,6 +253,16 @@ const CarDetail = () => {
     if (score >= 90) return 'text-green-600';
     if (score >= 75) return 'text-amber-500';
     return 'text-red-500';
+  };
+
+  const handleBookOrContact = (type: 'book' | 'contact') => {
+    if (type === 'book') {
+      setPopupMessage('Thank you! We have received your request. We will contact you soon to schedule your test drive.');
+    } else {
+      setPopupMessage('Thank you! Your contact details have been sent to the seller. We will contact you soon regarding this car.');
+    }
+    setPopupOpen(true);
+    setTimeout(() => setPopupOpen(false), 3500);
   };
 
   if (loading) {
@@ -299,6 +311,19 @@ const CarDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      {/* Popup Dialog */}
+      <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
+        <DialogContent className="max-w-md text-center">
+          <div className="flex flex-col items-center justify-center py-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Thank you!</h2>
+            <p className="text-gray-700 mb-2">{popupMessage}</p>
+            <Button className="mt-2" variant="outline" onClick={() => setPopupOpen(false)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
         {/* Breadcrumb */}
@@ -391,10 +416,10 @@ const CarDetail = () => {
               </div>
               
               <div className="space-y-4 mb-6">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => handleBookOrContact('book')}>
                   Book Test Drive
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => handleBookOrContact('contact')}>
                   <PhoneCall className="mr-2 h-4 w-4" />
                   Contact Seller
                 </Button>
