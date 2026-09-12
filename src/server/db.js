@@ -7,10 +7,7 @@ const connectDB = async () => {
     // Format: mongodb+srv://username:password@cluster.mongodb.net/wheelsxchange
     const mongoURI = process.env.MONGO_URI || 'mongodb+srv://your-username:your-password@your-cluster.mongodb.net/wheelsxchange?retryWrites=true&w=majority';
     
-    const conn = await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(mongoURI);
     
     console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
     console.log(`Database: ${conn.connection.name}`);
