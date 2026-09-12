@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files (never push real keys or database passwords)
+.env
+.env.*
+!.env.example
